@@ -1,3 +1,12 @@
 {
-    "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"]
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#cfae07",
+    "titleBar.activeBackground": "#cfae07",
+    "titleBar.inactiveBackground": "#cfae07",
+    "titleBar.inactiveForeground": "#FFF",
+    "titleBar.activeForeground": "#FFF"
+  },
+  "window.title": "S P A C E  I N V A D E R S"
 }
