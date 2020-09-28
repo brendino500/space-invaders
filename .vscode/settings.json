@@ -8,5 +8,6 @@
     "titleBar.inactiveForeground": "#FFF",
     "titleBar.activeForeground": "#FFF"
   },
-  "window.title": "S P A C E  I N V A D E R S"
+  "window.title": "S P A C E  I N V A D E R S",
+  "editor.formatOnSave": true
 }

@@ -18,7 +18,7 @@ window.onload = async (): Promise<void> => {
 
   document.body.appendChild(app.view);
 
-  resizeCanvas();
+  // resizeCanvas();
   new Game(stage, gameWidth, gameHeight);
 };
 
