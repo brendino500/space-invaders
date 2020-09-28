@@ -36,11 +36,15 @@ export default class Hero extends PIXI.Sprite {
   }
 
   private moveLeft(): void {
-    this.x -= this.width;
+    if (this.x - this.width > 0) {
+      this.x -= this.width;
+    }
   }
 
   private moveRight(): void {
-    this.x += this.width;
+    if (this.x + this.width < this.gameWidth) {
+      this.x += this.width;
+    }
   }
 
   private shoot(): void {
