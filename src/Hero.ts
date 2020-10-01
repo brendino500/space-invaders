@@ -18,7 +18,6 @@ export default class Hero extends PIXI.Sprite {
   }
 
   private handleKeyDown(e: KeyboardEvent): void {
-    console.log(e.code);
     switch (e.code) {
       case "ArrowLeft":
         this.moveLeft();
@@ -48,6 +47,6 @@ export default class Hero extends PIXI.Sprite {
   }
 
   private shoot(): void {
-    console.log("deal with you in a minute");
+    this.emit("shoot", this.x, this.y);
   }
 }

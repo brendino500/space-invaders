@@ -1,11 +1,13 @@
 import * as PIXI from "pixi.js";
 import Hero from "./Hero";
+import Fire from "./Fire";
 
 export default class Game {
   private stage: PIXI.Container;
   private gameWidth: number;
   private gameHeight: number;
   private hero: Hero;
+  private fireArray: Fire[] = [];
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -13,5 +15,17 @@ export default class Game {
     this.gameHeight = gameHeight;
     this.hero = new Hero(PIXI.Texture.from("birdUp.png"), gameWidth, gameHeight);
     this.stage.addChild(this.hero);
+    this.createListeners();
+  }
+
+  private createListeners(): void {
+    this.hero.on("shoot", this.handleShoot.bind(this));
+  }
+
+  private handleShoot(x: number, y: number): void {
+    const fire = new Fire(PIXI.Texture.from("goldMedal.png"), this.gameWidth, this.gameHeight, x, y);
+    this.stage.addChild(fire);
+    this.fireArray.push(fire);
+    console.log("engelbert");
   }
 }
