@@ -11,6 +11,7 @@ export default class Game {
   private hero: Hero;
   private fireArray: Fire[] = [];
   private enemyArray: Enemy[] = [];
+  private score = 0;
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -36,7 +37,7 @@ export default class Game {
       console.log("start");
     });
     tween.onComplete(() => {
-      this.destroyFire(fire);
+      this.destroySprite(fire, this.fireArray);
       console.log(this.fireArray.length);
     });
     tween.onUpdate(() => {
@@ -46,17 +47,28 @@ export default class Game {
           fire.y + fire.height / 2 > enemy.y - enemy.height / 2;
         const xOverlap =
           fire.x - fire.width / 2 < enemy.x + enemy.width / 2 && fire.x + fire.width / 2 > enemy.x - enemy.width / 2;
-        console.log(yOverlap, xOverlap, yOverlap && xOverlap);
+        const hit: boolean = yOverlap && xOverlap;
+        if (hit) {
+          tween.stop();
+          this.enemyHit(fire, enemy);
+        }
       });
     });
     tween.start(performance.now());
     console.log("engelbert", tween);
   }
 
-  private destroyFire(fire: Fire): void {
-    this.stage.removeChild(fire);
-    const index = this.fireArray.indexOf(fire);
-    this.fireArray.splice(index, 1);
+  private enemyHit(fire: Fire, enemy: Enemy): void {
+    this.destroySprite(enemy, this.enemyArray);
+    this.destroySprite(fire, this.fireArray);
+    this.score += 100;
+    console.log(this.fireArray, this.enemyArray, this.score);
+  }
+
+  private destroySprite(sprite: PIXI.Sprite, spriteArray: PIXI.Sprite[]): void {
+    this.stage.removeChild(sprite);
+    const index = spriteArray.indexOf(sprite);
+    spriteArray.splice(index, 1);
   }
 
   private createEnemies(): void {
