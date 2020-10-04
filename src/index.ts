@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import TWEEN from "@tweenjs/tween.js";
 import Game from "./Game";
 import "./style.css";
 
@@ -10,6 +11,12 @@ const app = new PIXI.Application({
   width: gameWidth,
   height: gameHeight,
 });
+
+function animate(time: number) {
+  requestAnimationFrame(animate);
+  TWEEN.update(time);
+}
+requestAnimationFrame(animate);
 
 const stage = app.stage;
 
