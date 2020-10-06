@@ -12,6 +12,9 @@ export default class Game {
   private fireArray: Fire[] = [];
   private enemyArray: Enemy[] = [];
   private score = 0;
+  private readonly enemyRows = 5;
+  private readonly enemyColumns = 11;
+  private readonly enemyPadding = 20;
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -72,14 +75,18 @@ export default class Game {
   }
 
   private createEnemies(): void {
-    const enemy = new Enemy(
-      PIXI.Texture.from("birdUp.png"),
-      this.gameWidth,
-      this.gameHeight,
-      this.gameWidth / 2,
-      this.gameHeight / 4
-    );
-    this.stage.addChild(enemy);
-    this.enemyArray.push(enemy);
+    for (let i = 0; i < this.enemyColumns; i++) {
+      for (let j = 0; j < this.enemyRows; j++) {
+        const enemy = new Enemy(
+          PIXI.Texture.from("birdUp.png"),
+          this.gameWidth,
+          this.gameHeight,
+          this.enemyPadding + this.enemyPadding * i,
+          this.enemyPadding + this.enemyPadding * j
+        );
+        this.stage.addChild(enemy);
+        this.enemyArray.push(enemy);
+      }
+    }
   }
 }

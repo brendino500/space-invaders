@@ -1,5 +1,9 @@
 body {
-    overflow: hidden;
-    margin: 0 auto;
-    background-color: black;
+  overflow: hidden;
+  margin: 0 auto;
+  background-color: black;
+}
+
+canvas {
+  border-radius: 7px;
 }

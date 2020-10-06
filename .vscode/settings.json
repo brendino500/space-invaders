@@ -9,5 +9,6 @@
     "titleBar.activeForeground": "#FFF"
   },
   "window.title": "S P A C E  I N V A D E R S",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true
 }
