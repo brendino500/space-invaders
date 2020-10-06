@@ -12,9 +12,11 @@ export default class Game {
   private fireArray: Fire[] = [];
   private enemyArray: Enemy[] = [];
   private score = 0;
-  private readonly enemyRows = 5;
-  private readonly enemyColumns = 11;
+  private readonly enemyRows = 11;
+  private readonly enemyColumns = 5;
   private readonly enemyPadding = 20;
+  private speed = 1000;
+  private enemyContainer = new PIXI.Container();
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -22,6 +24,7 @@ export default class Game {
     this.gameHeight = gameHeight;
     this.hero = new Hero(PIXI.Texture.from("birdUp.png"), gameWidth, gameHeight);
     this.stage.addChild(this.hero);
+    this.stage.addChild(this.enemyContainer);
     this.createListeners();
     this.createEnemies();
   }
@@ -40,16 +43,17 @@ export default class Game {
       console.log("start");
     });
     tween.onComplete(() => {
-      this.destroySprite(fire, this.fireArray);
+      this.destroySprite(this.stage, fire, this.fireArray);
       console.log(this.fireArray.length);
     });
     tween.onUpdate(() => {
       this.enemyArray.forEach((enemy) => {
         const yOverlap =
-          fire.y - fire.height / 2 < enemy.y + enemy.height / 2 &&
-          fire.y + fire.height / 2 > enemy.y - enemy.height / 2;
+          fire.y - fire.height / 2 < enemy.y + this.enemyContainer.y + enemy.height / 2 &&
+          fire.y + fire.height / 2 > enemy.y + this.enemyContainer.y - enemy.height / 2;
         const xOverlap =
-          fire.x - fire.width / 2 < enemy.x + enemy.width / 2 && fire.x + fire.width / 2 > enemy.x - enemy.width / 2;
+          fire.x - fire.width / 2 < enemy.x + this.enemyContainer.x + enemy.width / 2 &&
+          fire.x + fire.width / 2 > enemy.x + this.enemyContainer.x - enemy.width / 2;
         const hit: boolean = yOverlap && xOverlap;
         if (hit) {
           tween.stop();
@@ -62,14 +66,15 @@ export default class Game {
   }
 
   private enemyHit(fire: Fire, enemy: Enemy): void {
-    this.destroySprite(enemy, this.enemyArray);
-    this.destroySprite(fire, this.fireArray);
+    console.log("enemyHit");
+    this.destroySprite(this.enemyContainer, enemy, this.enemyArray);
+    this.destroySprite(this.stage, fire, this.fireArray);
     this.score += 100;
     console.log(this.fireArray, this.enemyArray, this.score);
   }
 
-  private destroySprite(sprite: PIXI.Sprite, spriteArray: PIXI.Sprite[]): void {
-    this.stage.removeChild(sprite);
+  private destroySprite(parent: PIXI.Container, sprite: PIXI.Sprite, spriteArray: PIXI.Sprite[]): void {
+    parent.removeChild(sprite);
     const index = spriteArray.indexOf(sprite);
     spriteArray.splice(index, 1);
   }
@@ -84,7 +89,7 @@ export default class Game {
           this.enemyPadding + this.enemyPadding * i,
           this.enemyPadding + this.enemyPadding * j
         );
-        this.stage.addChild(enemy);
+        this.enemyContainer.addChild(enemy);
         this.enemyArray.push(enemy);
       }
     }

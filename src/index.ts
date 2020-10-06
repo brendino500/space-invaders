@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import TWEEN from "@tweenjs/tween.js";
 import Game from "./Game";
 import "./style.css";
-
+window.PIXI = PIXI;
 const gameWidth = 800;
 const gameHeight = 600;
 
