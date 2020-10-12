@@ -12,11 +12,17 @@ export default class Game {
   private fireArray: Fire[] = [];
   private enemyArray: Enemy[] = [];
   private score = 0;
-  private readonly enemyRows = 11;
-  private readonly enemyColumns = 5;
+  private readonly enemyRows = 5;
+  private readonly enemyColumns = 11;
   private readonly enemyPadding = 20;
-  private speed = 1000;
+  private enemySpeed = 500;
   private enemyContainer = new PIXI.Container();
+  private enemyMovementInfo = {
+    canMoveRight: true,
+    canMoveDown: false,
+  };
+  private enemiesInterval: number | undefined;
+  private enemiesTween: any;
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -27,6 +33,7 @@ export default class Game {
     this.stage.addChild(this.enemyContainer);
     this.createListeners();
     this.createEnemies();
+    this.moveEnemies();
   }
 
   private createListeners(): void {
@@ -66,11 +73,23 @@ export default class Game {
   }
 
   private enemyHit(fire: Fire, enemy: Enemy): void {
-    console.log("enemyHit");
     this.destroySprite(this.enemyContainer, enemy, this.enemyArray);
     this.destroySprite(this.stage, fire, this.fireArray);
     this.score += 100;
-    console.log(this.fireArray, this.enemyArray, this.score);
+    if (this.enemyArray.length === 0) {
+      this.levelComplete();
+    }
+  }
+
+  private levelComplete(): void {
+    this.enemySpeed *= 0.9;
+    clearInterval(this.enemiesInterval);
+    this.enemiesTween.stop();
+    this.enemyContainer.position.set(0, 0);
+    this.enemyMovementInfo.canMoveDown = false;
+    this.enemyMovementInfo.canMoveRight = true;
+    this.createEnemies();
+    this.moveEnemies();
   }
 
   private destroySprite(parent: PIXI.Container, sprite: PIXI.Sprite, spriteArray: PIXI.Sprite[]): void {
@@ -93,5 +112,36 @@ export default class Game {
         this.enemyArray.push(enemy);
       }
     }
+  }
+
+  private moveEnemies(): void {
+    this.enemiesInterval = (setInterval(() => {
+      const enemyTweenData = {
+        moveRight: { x: this.enemyContainer.x + this.enemyPadding },
+        moveLeft: { x: this.enemyContainer.x - this.enemyPadding },
+        moveDown: { y: this.enemyContainer.y + this.enemyPadding },
+      };
+      let tweenData = {};
+      if (this.enemyMovementInfo.canMoveRight && !this.enemyMovementInfo.canMoveDown) {
+        tweenData = enemyTweenData.moveRight;
+        if (this.enemyContainer.x + this.enemyContainer.width + this.enemyPadding * 2.5 > this.gameWidth) {
+          this.enemyMovementInfo.canMoveDown = true;
+        }
+      } else if (this.enemyMovementInfo.canMoveDown) {
+        tweenData = enemyTweenData.moveDown;
+        this.enemyMovementInfo.canMoveDown = false;
+        this.enemyMovementInfo.canMoveRight = !this.enemyMovementInfo.canMoveRight;
+      } else {
+        tweenData = enemyTweenData.moveLeft;
+        if (this.enemyContainer.x - this.enemyPadding * 1.5 < 0) {
+          this.enemyMovementInfo.canMoveDown = true;
+        }
+      }
+
+      this.enemiesTween = new TWEEN.Tween({ enemiesContainer: this.enemyContainer })
+        .to({ enemiesContainer: tweenData }, this.enemySpeed / 2)
+        .easing(TWEEN.Easing.Sinusoidal.InOut);
+      this.enemiesTween.start(performance.now());
+    }, this.enemySpeed) as unknown) as number;
   }
 }
