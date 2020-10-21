@@ -24,6 +24,8 @@ export default class Game {
   };
   private enemiesInterval: number | undefined;
   private enemiesTween: any;
+  private bigEnemyTween: any;
+  private bigEnemy: Enemy | null = null;
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -31,11 +33,13 @@ export default class Game {
     this.gameHeight = gameHeight;
     this.hero = new Hero(PIXI.Texture.from("birdUp.png"), gameWidth, gameHeight);
     this.stage.addChild(this.hero);
+    this.enemyContainer.y = this.enemyPaddingY;
     this.stage.addChild(this.enemyContainer);
     this.createListeners();
     this.createEnemies();
     this.moveEnemies();
     this.enemyShoot();
+    this.createHighScoreEnemy();
   }
 
   private createListeners(): void {
@@ -60,6 +64,20 @@ export default class Game {
     });
     if (shotByHero) {
       tween.onUpdate(() => {
+        if (this.bigEnemy) {
+          const bigEnemyYOverlap =
+            fire.y - fire.height / 2 < this.bigEnemy.y + this.bigEnemy.height / 2 &&
+            fire.y + fire.height / 2 > this.bigEnemy.y - this.bigEnemy.height / 2;
+          const bigEnemyXOverlap =
+            fire.x - fire.width / 2 < this.bigEnemy.x + this.bigEnemy.width / 2 &&
+            fire.x + fire.width / 2 > this.bigEnemy.x - this.bigEnemy.width / 2;
+          if (bigEnemyXOverlap && bigEnemyYOverlap) {
+            if (this.bigEnemyTween) {
+              this.bigEnemyTween.stop();
+            }
+            this.resetBigEnemy(true);
+          }
+        }
         this.enemyArray.forEach((enemy) => {
           const yOverlap =
             fire.y - fire.height / 2 < enemy.y + this.enemyContainer.y + enemy.height / 2 &&
@@ -117,7 +135,7 @@ export default class Game {
     this.enemySpeed *= 0.9;
     clearInterval(this.enemiesInterval);
     this.enemiesTween.stop();
-    this.enemyContainer.position.set(0, 0);
+    this.enemyContainer.position.set(0, this.enemyPaddingY);
     this.enemyMovementInfo.canMoveDown = false;
     this.enemyMovementInfo.canMoveRight = true;
     this.createEnemies();
@@ -142,6 +160,38 @@ export default class Game {
         );
         this.enemyContainer.addChild(enemy);
         this.enemyArray.push(enemy);
+      }
+    }
+  }
+
+  private createHighScoreEnemy(): void {
+    this.bigEnemy = new Enemy(
+      PIXI.Texture.from("silverMedal.png"),
+      this.gameWidth,
+      this.gameHeight,
+      this.enemyPaddingX + this.gameWidth,
+      this.enemyPaddingY
+    );
+    this.stage.addChild(this.bigEnemy);
+    this.bigEnemyTween = new TWEEN.Tween({ bigEnemy: this.bigEnemy })
+      .to({ bigEnemy: { x: -this.enemyPaddingX } }, 8000)
+      .onComplete(() => {
+        this.resetBigEnemy(false);
+      })
+      .start(performance.now());
+  }
+
+  private resetBigEnemy(isShot: boolean, startTimer = true): void {
+    if (this.bigEnemy) {
+      this.stage.removeChild(this.bigEnemy);
+      this.bigEnemy = null;
+      if (startTimer) {
+        setTimeout(() => {
+          this.createHighScoreEnemy();
+        }, 5000);
+      }
+      if (isShot) {
+        this.score += 1000;
       }
     }
   }
