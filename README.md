@@ -1,38 +1,32 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/14e7ef42-5c90-44c8-a7ec-0b6e20c59735/deploy-status)](https://pixi-typescript-boilerplate.netlify.com) ![Windows build](https://github.com/jkanchelov/pixi-typescript-boilerplate/workflows/Windows%20build/badge.svg?branch=master) ![Linux build](https://github.com/jkanchelov/pixi-typescript-boilerplate/workflows/Linux%20build/badge.svg) ![MacOs build](https://github.com/jkanchelov/pixi-typescript-boilerplate/workflows/MacOs%20build/badge.svg)
+# 👾 Space Invaders
 
-# pixi-typescript-boilerplate
+## ☄️ Overview
 
-## Beginner friendly template for pixi.js with [Webpack](https://webpack.js.org/)
+- This is my first paired project coded in Pixi.js and TypeScript with Adam Regan.
 
----
+- After an intense coding bootcamp I didn't want to stop coding, **so set myself a challenge to learn TypeScript and Pixi.js**. This is my first project in Pixi.js and my second in TypeScript.
 
-#### The previous version done with [Parcel](https://parceljs.org/), which I won't support any further is [here](https://github.com/jkanchelov/pixi-typescript-boilerplate/tree/parcel-template)
+- As the bootcamp was incredibly fast paced, I realised that I had almost completely forgotten fundamentals and I wanted to code another project which focuses on game logic, rather than implementing a large framework like React.
 
----
+## 🖨 Technologies and Tools
 
-## Highlights
+- TypeScript
+- Pixi.js
+- Tween.js
 
--   🔰 - Beginner friendly.
--   🛠 - Typescript + Babel.
--   ✈️ - Live reload.
--   🚀 - Blazing fast bundle times
--   📝 - Consistent code style using Prettier and Eslint
--   📝 - Unit test support with [Jest](https://jestjs.io/), generating code coverage.
+## 🎮 Game instructions
 
-## Usage
+- **Enter** to start the game
+- ➡️ Move right
+- ⬅️ Move left
+- **Space Bar** to shoot
 
-### Click on the green button "Use this template" on top of the repo or <br> <br> Simply copy paste this and start coding
+## 💭 Process
 
-`git clone --depth=1 --branch=master https://github.com/jkanchelov/pixi-typescript-boilerplate`
+## 🩹 Challenges
 
-`rm -r -force ./pixi-typescript-boilerplate/.git`
+- TypeScript
 
-## Commands:
+## 🎉 Things I'd learnt
 
--   `npm run build` - starts build procedure
--   `npm run dev` - start watching for files and open's server on localhost:8080
--   `npm run test` - run tests
--   `npm run code-coverage` - generate code coverage report
--   `npm run code-style-check` - run's eslint and prettier check on your code
-
-For vscode users - ctrl ( or ⌘ ) + shift + b will run the watch build as its set as default vscode task
+## 🎙 Comments
