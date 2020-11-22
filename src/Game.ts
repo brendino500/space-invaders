@@ -39,7 +39,7 @@ export default class Game {
     this.createEnemies();
     this.moveEnemies();
     this.enemyShoot();
-    this.createHighScoreEnemy();
+    this.createBigEnemy();
   }
 
   private createListeners(): void {
@@ -72,9 +72,6 @@ export default class Game {
             fire.x - fire.width / 2 < this.bigEnemy.x + this.bigEnemy.width / 2 &&
             fire.x + fire.width / 2 > this.bigEnemy.x - this.bigEnemy.width / 2;
           if (bigEnemyXOverlap && bigEnemyYOverlap) {
-            if (this.bigEnemyTween) {
-              this.bigEnemyTween.stop();
-            }
             this.resetBigEnemy(true);
           }
         }
@@ -123,7 +120,13 @@ export default class Game {
   private heroHit(fire: Fire): void {
     this.destroySprite(this.stage, fire, this.fireArray);
     // REMOVE ENGLEBERT
-    this.enemyShoot();
+    this.gameOver();
+  }
+
+  private gameOver(): void {
+    this.destroyEnemies();
+    this.resetEnemiesTween();
+    this.resetBigEnemy(false, false);
   }
 
   private enemyShoot(): void {
@@ -133,13 +136,17 @@ export default class Game {
 
   private levelComplete(): void {
     this.enemySpeed *= 0.9;
+    this.resetEnemiesTween();
+    this.createEnemies();
+    this.moveEnemies();
+  }
+
+  private resetEnemiesTween(): void {
     clearInterval(this.enemiesInterval);
     this.enemiesTween.stop();
     this.enemyContainer.position.set(0, this.enemyPaddingY);
     this.enemyMovementInfo.canMoveDown = false;
     this.enemyMovementInfo.canMoveRight = true;
-    this.createEnemies();
-    this.moveEnemies();
   }
 
   private destroySprite(parent: PIXI.Container, sprite: PIXI.Sprite, spriteArray: PIXI.Sprite[]): void {
@@ -164,7 +171,14 @@ export default class Game {
     }
   }
 
-  private createHighScoreEnemy(): void {
+  private destroyEnemies(): void {
+    this.enemyArray.forEach((enemy: Enemy) => {
+      this.enemyContainer.removeChild(enemy);
+    });
+    this.enemyArray = [];
+  }
+
+  private createBigEnemy(): void {
     this.bigEnemy = new Enemy(
       PIXI.Texture.from("silverMedal.png"),
       this.gameWidth,
@@ -182,12 +196,15 @@ export default class Game {
   }
 
   private resetBigEnemy(isShot: boolean, startTimer = true): void {
+    if (this.bigEnemyTween) {
+      this.bigEnemyTween.stop();
+    }
     if (this.bigEnemy) {
       this.stage.removeChild(this.bigEnemy);
       this.bigEnemy = null;
       if (startTimer) {
         setTimeout(() => {
-          this.createHighScoreEnemy();
+          this.createBigEnemy();
         }, 5000);
       }
       if (isShot) {
