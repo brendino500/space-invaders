@@ -119,11 +119,32 @@ export default class Game {
 
   private heroHit(fire: Fire): void {
     this.destroySprite(this.stage, fire, this.fireArray);
-    // REMOVE ENGLEBERT
-    this.gameOver();
+    this.hero.removeInteractivity();
+    new TWEEN.Tween({ hero: this.hero })
+      .to({ hero: { y: this.gameHeight + this.hero.height, rotation: 180 / (180 / Math.PI) } }, 800)
+      .easing(TWEEN.Easing.Back.In)
+      .onComplete(() => {
+        this.stage.removeChild(this.hero);
+        this.gameOver();
+      })
+      .start(performance.now());
+    this.destroyAllEnemies();
   }
 
   private gameOver(): void {
+    const gameOverLabel = new PIXI.Text("GAME OVER, LOSER", {
+      fontFamily: "Arial",
+      fontSize: 24,
+      fill: 0xff1010,
+      align: "center",
+    });
+    gameOverLabel.anchor.set(0.5, 0.5);
+    gameOverLabel.x = this.gameWidth / 2;
+    gameOverLabel.y = this.gameHeight * 0.25;
+    this.stage.addChild(gameOverLabel);
+  }
+
+  private destroyAllEnemies(): void {
     this.destroyEnemies();
     this.resetEnemiesTween();
     this.resetBigEnemy(false, false);

@@ -3,6 +3,7 @@ import * as PIXI from "pixi.js";
 export default class Hero extends PIXI.Sprite {
   private gameWidth: number;
   private gameHeight: number;
+  private isInteractive = true;
 
   constructor(texture: PIXI.Texture, gameWidth: number, gameHeight: number) {
     super(texture);
@@ -17,20 +18,26 @@ export default class Hero extends PIXI.Sprite {
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
   }
 
+  public removeInteractivity(): void {
+    this.isInteractive = false;
+  }
+
   private handleKeyDown(e: KeyboardEvent): void {
-    switch (e.code) {
-      case "ArrowLeft":
-        this.moveLeft();
-        break;
-      case "ArrowRight":
-        this.moveRight();
-        break;
-      case "Space":
-        this.shoot();
-        break;
-      default:
-        console.log("Press the right keys, idiot");
-        break;
+    if (this.isInteractive) {
+      switch (e.code) {
+        case "ArrowLeft":
+          this.moveLeft();
+          break;
+        case "ArrowRight":
+          this.moveRight();
+          break;
+        case "Space":
+          this.shoot();
+          break;
+        default:
+          console.log("Press the right keys, idiot");
+          break;
+      }
     }
   }
 
