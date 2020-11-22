@@ -8,7 +8,7 @@ export default class Game {
   private stage: PIXI.Container;
   private gameWidth: number;
   private gameHeight: number;
-  private hero: Hero;
+  private hero: Hero | undefined;
   private fireArray: Fire[] = [];
   private enemyArray: Enemy[] = [];
   private score = 0;
@@ -32,12 +32,27 @@ export default class Game {
     fill: 0xff1010,
     align: "center",
   };
+  private onKeyDownStartGame = false;
+  private gameOverContainer = new PIXI.Container();
+  private gameOverHighScoreText: PIXI.Text | undefined;
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
     this.gameWidth = gameWidth;
     this.gameHeight = gameHeight;
-    this.hero = new Hero(PIXI.Texture.from("birdUp.png"), gameWidth, gameHeight);
+    window.addEventListener("keydown", this.handleKeyDown.bind(this));
+    this.setupGameOverPanel();
+    this.startGame();
+  }
+
+  private handleKeyDown(): void {
+    if (this.onKeyDownStartGame) {
+      this.startGame();
+    }
+  }
+
+  private startGame(): void {
+    this.hero = new Hero(PIXI.Texture.from("birdUp.png"), this.gameWidth, this.gameHeight);
     this.stage.addChild(this.hero);
     this.enemyContainer.y = this.enemyPaddingY;
     this.stage.addChild(this.enemyContainer);
@@ -46,10 +61,15 @@ export default class Game {
     this.moveEnemies();
     this.enemyShoot();
     this.createBigEnemy();
+    this.onKeyDownStartGame = false;
+    this.stage.removeChild(this.gameOverContainer);
+    this.score = 0;
   }
 
   private createListeners(): void {
-    this.hero.on("shoot", this.handleShoot.bind(this));
+    if (this.hero) {
+      this.hero.on("shoot", this.handleShoot.bind(this));
+    }
   }
 
   private handleShoot(x: number, y: number, shotByHero = true): void {
@@ -97,16 +117,18 @@ export default class Game {
       });
     } else {
       tween.onUpdate(() => {
-        const yOverlap =
-          fire.y - fire.height / 2 < this.hero.y + this.hero.height / 2 &&
-          fire.y + fire.height / 2 > this.hero.y - this.hero.height / 2;
-        const xOverlap =
-          fire.x - fire.width / 2 < this.hero.x + this.hero.width / 2 &&
-          fire.x + fire.width / 2 > this.hero.x - this.hero.width / 2;
-        if (yOverlap && xOverlap) {
-          tween.stop();
-          this.heroHit(fire);
-          console.log("englbert down!");
+        if (this.hero) {
+          const yOverlap =
+            fire.y - fire.height / 2 < this.hero.y + this.hero.height / 2 &&
+            fire.y + fire.height / 2 > this.hero.y - this.hero.height / 2;
+          const xOverlap =
+            fire.x - fire.width / 2 < this.hero.x + this.hero.width / 2 &&
+            fire.x + fire.width / 2 > this.hero.x - this.hero.width / 2;
+          if (yOverlap && xOverlap) {
+            tween.stop();
+            this.heroHit(fire);
+            console.log("englbert down!");
+          }
         }
       });
     }
@@ -125,36 +147,49 @@ export default class Game {
 
   private heroHit(fire: Fire): void {
     this.destroySprite(this.stage, fire, this.fireArray);
-    this.hero.removeInteractivity();
-    new TWEEN.Tween({ hero: this.hero })
-      .to({ hero: { y: this.gameHeight + this.hero.height, rotation: 180 / (180 / Math.PI) } }, 800)
-      .easing(TWEEN.Easing.Back.In)
-      .onComplete(() => {
-        this.stage.removeChild(this.hero);
-        this.gameOver();
-      })
-      .start(performance.now());
+    if (this.hero) {
+      this.hero.removeInteractivity();
+
+      new TWEEN.Tween({ hero: this.hero })
+        .to({ hero: { y: this.gameHeight + this.hero.height, rotation: 180 / (180 / Math.PI) } }, 800)
+        .easing(TWEEN.Easing.Back.In)
+        .onComplete(() => {
+          if (this.hero) {
+            this.stage.removeChild(this.hero);
+          }
+          this.gameOver();
+        })
+        .start(performance.now());
+    }
     this.destroyAllEnemies();
   }
 
-  private gameOver(): void {
+  private setupGameOverPanel(): void {
     const gameOverLabel = new PIXI.Text("GAME OVER, LOSER", this.gameOverTextConfig);
     gameOverLabel.anchor.set(0.5, 0.5);
     gameOverLabel.x = this.gameWidth / 2;
     gameOverLabel.y = this.gameHeight * 0.25;
-    this.stage.addChild(gameOverLabel);
+    this.gameOverContainer.addChild(gameOverLabel);
 
-    const highscore = new PIXI.Text(`SCORE ${this.score}`, this.gameOverTextConfig);
-    highscore.anchor.set(0.5, 0.5);
-    highscore.x = this.gameWidth / 2;
-    highscore.y = gameOverLabel.y + 50;
-    this.stage.addChild(highscore);
+    this.gameOverHighScoreText = new PIXI.Text(`SCORE ${this.score}`, this.gameOverTextConfig);
+    this.gameOverHighScoreText.anchor.set(0.5, 0.5);
+    this.gameOverHighScoreText.x = this.gameWidth / 2;
+    this.gameOverHighScoreText.y = gameOverLabel.y + 50;
+    this.gameOverContainer.addChild(this.gameOverHighScoreText);
 
-    const playAgain = new PIXI.Text(`PLAY AGAIN? `, this.gameOverTextConfig);
+    const playAgain = new PIXI.Text(`PRESS ANY KEY TO PLAY AGAIN 😊`, this.gameOverTextConfig);
     playAgain.anchor.set(0.5, 0.5);
     playAgain.x = this.gameWidth / 2;
-    playAgain.y = highscore.y + 150;
-    this.stage.addChild(playAgain);
+    playAgain.y = this.gameOverHighScoreText.y + 150;
+    this.gameOverContainer.addChild(playAgain);
+  }
+
+  private gameOver(): void {
+    if (this.gameOverHighScoreText) {
+      this.gameOverHighScoreText.text = `SCORE ${this.score}`;
+    }
+    this.stage.addChild(this.gameOverContainer);
+    this.onKeyDownStartGame = true;
   }
 
   private destroyAllEnemies(): void {
