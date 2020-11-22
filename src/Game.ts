@@ -26,6 +26,12 @@ export default class Game {
   private enemiesTween: any;
   private bigEnemyTween: any;
   private bigEnemy: Enemy | null = null;
+  private gameOverTextConfig = {
+    fontFamily: "Arial ",
+    fontSize: 24,
+    fill: 0xff1010,
+    align: "center",
+  };
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -132,16 +138,23 @@ export default class Game {
   }
 
   private gameOver(): void {
-    const gameOverLabel = new PIXI.Text("GAME OVER, LOSER", {
-      fontFamily: "Arial",
-      fontSize: 24,
-      fill: 0xff1010,
-      align: "center",
-    });
+    const gameOverLabel = new PIXI.Text("GAME OVER, LOSER", this.gameOverTextConfig);
     gameOverLabel.anchor.set(0.5, 0.5);
     gameOverLabel.x = this.gameWidth / 2;
     gameOverLabel.y = this.gameHeight * 0.25;
     this.stage.addChild(gameOverLabel);
+
+    const highscore = new PIXI.Text(`SCORE ${this.score}`, this.gameOverTextConfig);
+    highscore.anchor.set(0.5, 0.5);
+    highscore.x = this.gameWidth / 2;
+    highscore.y = gameOverLabel.y + 50;
+    this.stage.addChild(highscore);
+
+    const playAgain = new PIXI.Text(`PLAY AGAIN? `, this.gameOverTextConfig);
+    playAgain.anchor.set(0.5, 0.5);
+    playAgain.x = this.gameWidth / 2;
+    playAgain.y = highscore.y + 150;
+    this.stage.addChild(playAgain);
   }
 
   private destroyAllEnemies(): void {
