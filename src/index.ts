@@ -32,7 +32,14 @@ window.onload = async (): Promise<void> => {
 async function loadGameAssets(): Promise<void> {
   return new Promise((res, rej) => {
     const loader = PIXI.Loader.shared;
-    loader.add("rabbit", "./assets/simpleSpriteSheet.json");
+    loader.add("simple", "./assets/simpleSpriteSheet.json");
+    loader.add("piggy", "./assets/angry_pig.json");
+    loader.add("bunny", "./assets/bunny.json");
+    loader.add("duck", "./assets/duck.json");
+    loader.add("ghost", "./assets/ghost.json");
+    loader.add("mask", "./assets/mask_run.json");
+    loader.add("frog", "./assets/ninja_frog_run.json");
+    loader.add("rock", "./assets/rock.json");
 
     loader.onComplete.once(() => {
       res();

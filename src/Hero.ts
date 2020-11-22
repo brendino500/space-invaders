@@ -1,17 +1,19 @@
 import * as PIXI from "pixi.js";
 
-export default class Hero extends PIXI.Sprite {
+export default class Hero extends PIXI.AnimatedSprite {
   private gameWidth: number;
   private gameHeight: number;
   private isInteractive = true;
 
-  constructor(texture: PIXI.Texture, gameWidth: number, gameHeight: number) {
+  constructor(texture: PIXI.Texture[], gameWidth: number, gameHeight: number) {
     super(texture);
     this.gameWidth = gameWidth;
     this.gameHeight = gameHeight;
     this.anchor.set(0.5, 0.5);
     this.position.set(this.gameWidth / 2, this.gameHeight * 0.8);
     this.addInteractivity();
+    this.play();
+    this.animationSpeed = 0.4;
   }
 
   private addInteractivity(): void {
@@ -27,9 +29,11 @@ export default class Hero extends PIXI.Sprite {
       switch (e.code) {
         case "ArrowLeft":
           this.moveLeft();
+          this.scale.x = -1;
           break;
         case "ArrowRight":
           this.moveRight();
+          this.scale.x = 1;
           break;
         case "Space":
           this.shoot();

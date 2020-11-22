@@ -1,0 +1,89 @@
+{
+  "frames": {
+    "angry_pig00.png": {
+      "frame": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig01.png": {
+      "frame": { "x": 36, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig02.png": {
+      "frame": { "x": 72, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig03.png": {
+      "frame": { "x": 108, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig04.png": {
+      "frame": { "x": 144, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig05.png": {
+      "frame": { "x": 180, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig06.png": {
+      "frame": { "x": 216, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig07.png": {
+      "frame": { "x": 252, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    },
+    "angry_pig08.png": {
+      "frame": { "x": 288, "y": 0, "w": 36, "h": 30 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 30 },
+      "sourceSize": { "w": 36, "h": 30 }
+    }
+  },
+  "animations": {
+    "tile": [
+      "angry_pig00.png",
+      "angry_pig01.png",
+      "angry_pig02.png",
+      "angry_pig03.png",
+      "angry_pig04.png",
+      "angry_pig05.png",
+      "angry_pig06.png",
+      "angry_pig07.png",
+      "angry_pig08.png"
+    ]
+  },
+  "meta": {
+    "app": "https://www.codeandweb.com/texturepacker",
+    "version": "1.0",
+    "image": "angry_pig.png",
+    "format": "RGBA8888",
+    "size": { "w": 324, "h": 30 },
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:475c5617da836f5ab93f7b95ebe63649:d01bd5fcfe757df9b3220aa0b19aee24:b8217c55c19f8b64f69a4e2eda2e3731$"
+  }
+}

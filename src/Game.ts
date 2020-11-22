@@ -14,9 +14,9 @@ export default class Game {
   private score = 0;
   private readonly enemyRows = 5;
   private readonly enemyColumns = 11;
-  private readonly enemyPaddingX = 30;
-  private readonly enemyPaddingY = 25;
-  private enemySpeed = 800;
+  private readonly enemyPaddingX = 40;
+  private readonly enemyPaddingY = 30;
+  private enemySpeed = 1000;
   private enemyContainer = new PIXI.Container();
   private enemyMovementInfo = {
     canMoveRight: true,
@@ -52,7 +52,23 @@ export default class Game {
   }
 
   private startGame(): void {
-    this.hero = new Hero(PIXI.Texture.from("birdUp.png"), this.gameWidth, this.gameHeight);
+    const heroTextures = [
+      "ninja_frog_run00.png",
+      "ninja_frog_run01.png",
+      "ninja_frog_run02.png",
+      "ninja_frog_run03.png",
+      "ninja_frog_run04.png",
+      "ninja_frog_run05.png",
+      "ninja_frog_run06.png",
+      "ninja_frog_run07.png",
+      "ninja_frog_run08.png",
+      "ninja_frog_run09.png",
+      "ninja_frog_run10.png",
+      "ninja_frog_run11.png",
+    ].map((e) => {
+      return PIXI.Texture.from(e);
+    });
+    this.hero = new Hero(heroTextures, this.gameWidth, this.gameHeight);
     this.stage.addChild(this.hero);
     this.enemyContainer.y = this.enemyPaddingY;
     this.stage.addChild(this.enemyContainer);
@@ -225,10 +241,52 @@ export default class Game {
   }
 
   private createEnemies(): void {
+    const enemyTexturesArray = [
+      [
+        "duck00.png",
+        "duck01.png",
+        "duck02.png",
+        "duck03.png",
+        "duck04.png",
+        "duck05.png",
+        "duck06.png",
+        "duck07.png",
+        "duck08.png",
+        "duck09.png",
+      ].map((e) => {
+        return PIXI.Texture.from(e);
+      }),
+      [
+        "bunny00.png",
+        "bunny01.png",
+        "bunny02.png",
+        "bunny03.png",
+        "bunny04.png",
+        "bunny05.png",
+        "bunny06.png",
+        "bunny07.png",
+      ].map((e) => {
+        return PIXI.Texture.from(e);
+      }),
+      [
+        "angry_pig00.png",
+        "angry_pig01.png",
+        "angry_pig02.png",
+        "angry_pig03.png",
+        "angry_pig04.png",
+        "angry_pig05.png",
+        "angry_pig06.png",
+        "angry_pig07.png",
+        "angry_pig08.png",
+      ].map((e) => {
+        return PIXI.Texture.from(e);
+      }),
+    ];
     for (let i = 0; i < this.enemyColumns; i++) {
       for (let j = 0; j < this.enemyRows; j++) {
+        const enemyTextures = enemyTexturesArray[Math.floor(Math.random() * enemyTexturesArray.length)];
         const enemy = new Enemy(
-          PIXI.Texture.from("birdUp.png"),
+          enemyTextures,
           this.gameWidth,
           this.gameHeight,
           this.enemyPaddingX + this.enemyPaddingX * i,
@@ -248,8 +306,22 @@ export default class Game {
   }
 
   private createBigEnemy(): void {
+    const bigEnemyTextures = [
+      "ghost00.png",
+      "ghost01.png",
+      "ghost02.png",
+      "ghost03.png",
+      "ghost04.png",
+      "ghost05.png",
+      "ghost06.png",
+      "ghost07.png",
+      "ghost08.png",
+      "ghost09.png",
+    ].map((e) => {
+      return PIXI.Texture.from(e);
+    });
     this.bigEnemy = new Enemy(
-      PIXI.Texture.from("silverMedal.png"),
+      bigEnemyTextures,
       this.gameWidth,
       this.gameHeight,
       this.enemyPaddingX + this.gameWidth,
