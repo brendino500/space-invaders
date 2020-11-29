@@ -53,18 +53,19 @@ export default class Game {
 
   private startGame(): void {
     const heroTextures = [
-      "ninja_frog_run00.png",
-      "ninja_frog_run01.png",
-      "ninja_frog_run02.png",
-      "ninja_frog_run03.png",
-      "ninja_frog_run04.png",
-      "ninja_frog_run05.png",
-      "ninja_frog_run06.png",
-      "ninja_frog_run07.png",
-      "ninja_frog_run08.png",
-      "ninja_frog_run09.png",
-      "ninja_frog_run10.png",
-      "ninja_frog_run11.png",
+      "rock00.png",
+      "rock01.png",
+      "rock02.png",
+      "rock03.png",
+      "rock04.png",
+      "rock05.png",
+      "rock06.png",
+      "rock07.png",
+      "rock08.png",
+      "rock09.png",
+      "rock10.png",
+      "rock11.png",
+      "rock12.png",
     ].map((e) => {
       return PIXI.Texture.from(e);
     });
@@ -89,7 +90,7 @@ export default class Game {
   }
 
   private handleShoot(x: number, y: number, shotByHero = true): void {
-    const fire = new Fire(PIXI.Texture.from("goldMedal.png"), this.gameWidth, this.gameHeight, x, y);
+    const fire = new Fire(PIXI.Texture.from("goldMedal.png"), this.gameWidth, this.gameHeight, x, y - 15);
     this.stage.addChild(fire);
     this.fireArray.push(fire);
     const yTarget = shotByHero ? -fire.height : this.gameHeight + fire.height;
