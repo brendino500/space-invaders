@@ -12,6 +12,7 @@ export default class Game {
   private fireArray: Fire[] = [];
   private enemyArray: Enemy[] = [];
   private score = 0;
+  private scoreIncrement = 100;
   private readonly enemyRows = 5;
   private readonly enemyColumns = 11;
   private readonly enemyPaddingX = 40;
@@ -35,6 +36,7 @@ export default class Game {
   private onKeyDownStartGame = false;
   private gameOverContainer = new PIXI.Container();
   private gameOverHighScoreText: PIXI.Text | undefined;
+  private scoreText: PIXI.Text | undefined;
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -42,6 +44,7 @@ export default class Game {
     this.gameHeight = gameHeight;
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
     this.setupGameOverPanel();
+    this.setupScore();
     this.startGame();
   }
 
@@ -53,19 +56,18 @@ export default class Game {
 
   private startGame(): void {
     const heroTextures = [
-      "rock00.png",
-      "rock01.png",
-      "rock02.png",
-      "rock03.png",
-      "rock04.png",
-      "rock05.png",
-      "rock06.png",
-      "rock07.png",
-      "rock08.png",
-      "rock09.png",
-      "rock10.png",
-      "rock11.png",
-      "rock12.png",
+      "ninja_frog_run00.png",
+      "ninja_frog_run01.png",
+      "ninja_frog_run02.png",
+      "ninja_frog_run03.png",
+      "ninja_frog_run04.png",
+      "ninja_frog_run05.png",
+      "ninja_frog_run06.png",
+      "ninja_frog_run07.png",
+      "ninja_frog_run08.png",
+      "ninja_frog_run09.png",
+      "ninja_frog_run10.png",
+      "ninja_frog_run11.png",
     ].map((e) => {
       return PIXI.Texture.from(e);
     });
@@ -81,6 +83,16 @@ export default class Game {
     this.onKeyDownStartGame = false;
     this.stage.removeChild(this.gameOverContainer);
     this.score = 0;
+    this.scoreIncrement = 100;
+    if (this.scoreText) {
+      this.scoreText.visible = true;
+    }
+  }
+
+  private setupScore(): void {
+    this.scoreText = new PIXI.Text(`SCORE: ${this.score}`, this.gameOverTextConfig);
+    this.stage.addChild(this.scoreText);
+    this.scoreText.visible = false;
   }
 
   private createListeners(): void {
@@ -150,13 +162,15 @@ export default class Game {
       });
     }
     tween.start(performance.now());
-    console.log("engelbert", tween);
   }
 
   private enemyHit(fire: Fire, enemy: Enemy): void {
     this.destroySprite(this.enemyContainer, enemy, this.enemyArray);
     this.destroySprite(this.stage, fire, this.fireArray);
-    this.score += 100;
+    this.score += this.scoreIncrement;
+    if (this.scoreText) {
+      this.scoreText.text = `SCORE: ${this.score}`;
+    }
     if (this.enemyArray.length === 0) {
       this.levelComplete();
     }
@@ -207,6 +221,9 @@ export default class Game {
     }
     this.stage.addChild(this.gameOverContainer);
     this.onKeyDownStartGame = true;
+    if (this.scoreText) {
+      this.scoreText.visible = false;
+    }
   }
 
   private destroyAllEnemies(): void {
@@ -222,6 +239,7 @@ export default class Game {
 
   private levelComplete(): void {
     this.enemySpeed *= 0.9;
+    this.scoreIncrement *= 2;
     this.resetEnemiesTween();
     this.createEnemies();
     this.moveEnemies();
@@ -351,6 +369,9 @@ export default class Game {
       }
       if (isShot) {
         this.score += 1000;
+        if (this.scoreText) {
+          this.scoreText.text = `SCORE: ${this.score}`;
+        }
       }
     }
   }
