@@ -29,9 +29,11 @@ export default class Game {
   private bigEnemyTween: any;
   private bigEnemy: Enemy | null = null;
   private gameOverTextConfig = {
-    fontFamily: "Arial ",
+    fontFamily: "Menlo-Bold",
     fontSize: 24,
-    fill: 0xff1010,
+    fill: 0xde2b63,
+    // strokeThickness: 2,
+    // stroke: 0x1b395a,
     align: "center",
   };
   private onKeyDownStartGame = false;
