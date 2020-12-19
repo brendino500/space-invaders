@@ -40,6 +40,7 @@ async function loadGameAssets(): Promise<void> {
     loader.add("mask", "./assets/mask_run.json");
     loader.add("frog", "./assets/ninja_frog_run.json");
     loader.add("rock", "./assets/rock.json");
+    loader.add("background-tile", "./assets/background-tile.png");
 
     loader.onComplete.once(() => {
       res();

@@ -1,9 +1,11 @@
+import TWEEN from "@tweenjs/tween.js";
 import * as PIXI from "pixi.js";
 
 export default class Hero extends PIXI.AnimatedSprite {
   private gameWidth: number;
   private gameHeight: number;
   private isInteractive = true;
+  private heroScale = 1.25;
 
   constructor(texture: PIXI.Texture[], gameWidth: number, gameHeight: number) {
     super(texture);
@@ -11,6 +13,7 @@ export default class Hero extends PIXI.AnimatedSprite {
     this.gameHeight = gameHeight;
     this.anchor.set(0.5, 0.5);
     this.position.set(this.gameWidth / 2, this.gameHeight * 0.8);
+    this.scale.set(this.heroScale, this.heroScale);
     this.addInteractivity();
     this.play();
     this.animationSpeed = 0.4;
@@ -29,11 +32,11 @@ export default class Hero extends PIXI.AnimatedSprite {
       switch (e.code) {
         case "ArrowLeft":
           this.moveLeft();
-          this.scale.x = -1;
+          this.scale.x = -this.heroScale;
           break;
         case "ArrowRight":
           this.moveRight();
-          this.scale.x = 1;
+          this.scale.x = this.heroScale;
           break;
         case "Space":
           this.shoot();
@@ -47,14 +50,18 @@ export default class Hero extends PIXI.AnimatedSprite {
 
   private moveLeft(): void {
     if (this.x - this.width > 0) {
-      this.x -= this.width;
+      this.move(-this.width);
     }
   }
 
   private moveRight(): void {
     if (this.x + this.width < this.gameWidth) {
-      this.x += this.width;
+      this.move(this.width);
     }
+  }
+
+  private move(offsetX: number): void {
+    new TWEEN.Tween({ hero: this }).to({ hero: { x: this.x + offsetX } }, 150).start(performance.now());
   }
 
   private shoot(): void {

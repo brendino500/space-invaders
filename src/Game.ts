@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import Hero from "./Hero";
 import Fire from "./Fire";
 import Enemy from "./Enemy";
+import Background from "./Background";
 import TWEEN from "@tweenjs/tween.js";
 
 export default class Game {
@@ -43,6 +44,7 @@ export default class Game {
     this.gameWidth = gameWidth;
     this.gameHeight = gameHeight;
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
+    this.setupBackground();
     this.setupGameOverPanel();
     this.setupScore();
     this.startGame();
@@ -87,6 +89,11 @@ export default class Game {
     if (this.scoreText) {
       this.scoreText.visible = true;
     }
+  }
+
+  private setupBackground(): void {
+    const background = new Background(this.gameWidth, this.gameHeight);
+    this.stage.addChild(background);
   }
 
   private setupScore(): void {
@@ -303,7 +310,8 @@ export default class Game {
     ];
     for (let i = 0; i < this.enemyColumns; i++) {
       for (let j = 0; j < this.enemyRows; j++) {
-        const enemyTextures = enemyTexturesArray[Math.floor(Math.random() * enemyTexturesArray.length)];
+        const enemyLayout = [0, 1, 1, 2, 2];
+        const enemyTextures = enemyTexturesArray[enemyLayout[j]];
         const enemy = new Enemy(
           enemyTextures,
           this.gameWidth,
