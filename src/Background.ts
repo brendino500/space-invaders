@@ -1,3 +1,4 @@
+import TWEEN from "@tweenjs/tween.js";
 import * as PIXI from "pixi.js";
 
 export default class Background extends PIXI.Container {
@@ -15,7 +16,7 @@ export default class Background extends PIXI.Container {
     const tileTexture = PIXI.Texture.from("./assets/background-tile.png");
     console.log(tileTexture);
     const tilesX = Math.ceil(this.gameWidth / tileTexture.width);
-    const tilesY = Math.ceil(this.gameHeight / tileTexture.height);
+    const tilesY = Math.ceil(this.gameHeight / tileTexture.height) + 1;
 
     for (let i = 0; i < tilesX; i++) {
       for (let j = 0; j < tilesY; j++) {
@@ -24,5 +25,12 @@ export default class Background extends PIXI.Container {
         this.addChild(tileSprite);
       }
     }
+
+    this.y -= tileTexture.height;
+
+    new TWEEN.Tween({ background: this })
+      .to({ background: { y: 0 } }, 3000)
+      .repeat(Infinity)
+      .start(performance.now());
   }
 }
