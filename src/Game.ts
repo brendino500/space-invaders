@@ -38,6 +38,7 @@ export default class Game {
   private gameOverContainer = new PIXI.Container();
   private gameOverHighScoreText: PIXI.Text | undefined;
   private scoreText: PIXI.Text | undefined;
+  private createBigEnemyTimeout: ReturnType<typeof setTimeout> | undefined;
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -224,6 +225,9 @@ export default class Game {
   }
 
   private gameOver(): void {
+    if (this.createBigEnemyTimeout) {
+      clearTimeout(this.createBigEnemyTimeout);
+    }
     if (this.gameOverHighScoreText) {
       this.gameOverHighScoreText.text = `SCORE ${this.score}`;
     }
@@ -334,6 +338,7 @@ export default class Game {
   }
 
   private createBigEnemy(): void {
+    console.trace("createEnemy");
     const bigEnemyTextures = [
       "ghost00.png",
       "ghost01.png",
@@ -372,7 +377,7 @@ export default class Game {
       this.stage.removeChild(this.bigEnemy);
       this.bigEnemy = null;
       if (startTimer) {
-        setTimeout(() => {
+        this.createBigEnemyTimeout = setTimeout(() => {
           this.createBigEnemy();
         }, 5000);
       }
