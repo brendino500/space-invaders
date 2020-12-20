@@ -32,8 +32,6 @@ export default class Game {
     fontFamily: "Menlo-Bold",
     fontSize: 24,
     fill: 0xde2b63,
-    // strokeThickness: 2,
-    // stroke: 0x1b395a,
     align: "center",
   };
   private onKeyDownStartGame = false;
@@ -89,6 +87,7 @@ export default class Game {
     this.score = 0;
     this.scoreIncrement = 100;
     if (this.scoreText) {
+      this.scoreText.text = `SCORE: ${this.score}`;
       this.scoreText.visible = true;
     }
   }
