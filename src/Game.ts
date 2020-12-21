@@ -225,6 +225,7 @@ export default class Game {
   }
 
   private gameOver(): void {
+    this.resetBigEnemy(false, false);
     if (this.createBigEnemyTimeout) {
       clearTimeout(this.createBigEnemyTimeout);
     }
@@ -338,7 +339,6 @@ export default class Game {
   }
 
   private createBigEnemy(): void {
-    console.trace("createEnemy");
     const bigEnemyTextures = [
       "ghost00.png",
       "ghost01.png",
@@ -378,6 +378,7 @@ export default class Game {
       this.bigEnemy = null;
       if (startTimer) {
         this.createBigEnemyTimeout = setTimeout(() => {
+          console.log("create from timeout");
           this.createBigEnemy();
         }, 5000);
       }
