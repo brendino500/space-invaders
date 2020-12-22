@@ -18,6 +18,7 @@ export default class Game {
   private readonly enemyColumns = 11;
   private readonly enemyPaddingX = 40;
   private readonly enemyPaddingY = 30;
+  private maxEnemyContainerWidth: number | undefined;
   private enemySpeed = 1000;
   private enemyContainer = new PIXI.Container();
   private enemyMovementInfo = {
@@ -329,6 +330,7 @@ export default class Game {
         this.enemyArray.push(enemy);
       }
     }
+    this.maxEnemyContainerWidth = this.enemyContainer.width;
   }
 
   private destroyEnemies(): void {
@@ -401,7 +403,7 @@ export default class Game {
       let tweenData = {};
       if (this.enemyMovementInfo.canMoveRight && !this.enemyMovementInfo.canMoveDown) {
         tweenData = enemyTweenData.moveRight;
-        if (this.enemyContainer.x + this.enemyContainer.width + this.enemyPaddingX * 2.5 > this.gameWidth) {
+        if (this.enemyContainer.x + this.getRightMostEnemyX() + this.enemyPaddingX * 2.5 > this.gameWidth) {
           this.enemyMovementInfo.canMoveDown = true;
         }
       } else if (this.enemyMovementInfo.canMoveDown) {
@@ -410,7 +412,7 @@ export default class Game {
         this.enemyMovementInfo.canMoveRight = !this.enemyMovementInfo.canMoveRight;
       } else {
         tweenData = enemyTweenData.moveLeft;
-        if (this.enemyContainer.x - this.enemyPaddingX * 1.5 < 0) {
+        if (this.enemyContainer.x + this.getLeftMostEnemyX() - this.enemyPaddingX * 2.5 < 0) {
           this.enemyMovementInfo.canMoveDown = true;
         }
       }
@@ -420,5 +422,25 @@ export default class Game {
         .easing(TWEEN.Easing.Sinusoidal.InOut);
       this.enemiesTween.start(performance.now());
     }, this.enemySpeed) as unknown) as number;
+  }
+
+  private getLeftMostEnemyX(): number {
+    let leftX = this.maxEnemyContainerWidth || 0;
+    this.enemyContainer.children.forEach((child) => {
+      if (child.x < leftX) {
+        leftX = child.x;
+      }
+    });
+    return leftX;
+  }
+
+  private getRightMostEnemyX(): number {
+    let rightX = 0;
+    this.enemyContainer.children.forEach((child) => {
+      if (child.x > rightX) {
+        rightX = child.x;
+      }
+    });
+    return rightX;
   }
 }
