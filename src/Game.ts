@@ -37,9 +37,11 @@ export default class Game {
   };
   private onKeyDownStartGame = false;
   private gameOverContainer = new PIXI.Container();
+  private gameOverScoreText: PIXI.Text | undefined;
   private gameOverHighScoreText: PIXI.Text | undefined;
   private scoreText: PIXI.Text | undefined;
   private createBigEnemyTimeout: ReturnType<typeof setTimeout> | undefined;
+  private readonly localStorageKey = "High Score";
 
   constructor(stage: PIXI.Container, gameWidth: number, gameHeight: number) {
     this.stage = stage;
@@ -117,12 +119,8 @@ export default class Game {
     this.fireArray.push(fire);
     const yTarget = shotByHero ? -fire.height : this.gameHeight + fire.height;
     const tween = new TWEEN.Tween({ fire }).to({ fire: { y: yTarget } }, 1000);
-    tween.onStart(() => {
-      console.log("start");
-    });
     tween.onComplete(() => {
       this.destroySprite(this.stage, fire, this.fireArray);
-      console.log(this.fireArray.length);
       if (!shotByHero) {
         this.enemyShoot();
       }
@@ -166,7 +164,6 @@ export default class Game {
           if (yOverlap && xOverlap) {
             tween.stop();
             this.heroHit(fire);
-            console.log("englbert down!");
           }
         }
       });
@@ -212,16 +209,21 @@ export default class Game {
     gameOverLabel.y = this.gameHeight * 0.25;
     this.gameOverContainer.addChild(gameOverLabel);
 
-    this.gameOverHighScoreText = new PIXI.Text(`SCORE ${this.score}`, this.gameOverTextConfig);
+    this.gameOverScoreText = new PIXI.Text(`SCORE ${this.score}`, this.gameOverTextConfig);
+    this.gameOverScoreText.anchor.set(0.5, 0.5);
+    this.gameOverScoreText.x = this.gameWidth / 2;
+    this.gameOverScoreText.y = gameOverLabel.y + 50;
+    this.gameOverContainer.addChild(this.gameOverScoreText);
+    this.gameOverHighScoreText = new PIXI.Text(`HIGHSCORE 0`, this.gameOverTextConfig);
     this.gameOverHighScoreText.anchor.set(0.5, 0.5);
     this.gameOverHighScoreText.x = this.gameWidth / 2;
-    this.gameOverHighScoreText.y = gameOverLabel.y + 50;
+    this.gameOverHighScoreText.y = this.gameOverScoreText.y + 50;
     this.gameOverContainer.addChild(this.gameOverHighScoreText);
 
     const playAgain = new PIXI.Text(`PRESS ANY KEY TO PLAY AGAIN 😊`, this.gameOverTextConfig);
     playAgain.anchor.set(0.5, 0.5);
     playAgain.x = this.gameWidth / 2;
-    playAgain.y = this.gameOverHighScoreText.y + 150;
+    playAgain.y = this.gameOverScoreText.y + 150;
     this.gameOverContainer.addChild(playAgain);
   }
 
@@ -230,8 +232,18 @@ export default class Game {
     if (this.createBigEnemyTimeout) {
       clearTimeout(this.createBigEnemyTimeout);
     }
+    let highScore = Number(localStorage.getItem(this.localStorageKey));
+    if (!highScore || this.score > highScore) {
+      highScore = this.score;
+      localStorage.setItem(this.localStorageKey, String(this.score));
+    }
+    console.log(localStorage.getItem(this.localStorageKey));
+
+    if (this.gameOverScoreText) {
+      this.gameOverScoreText.text = `SCORE ${this.score}`;
+    }
     if (this.gameOverHighScoreText) {
-      this.gameOverHighScoreText.text = `SCORE ${this.score}`;
+      this.gameOverHighScoreText.text = `HIGHSCORE ${highScore}`;
     }
     this.stage.addChild(this.gameOverContainer);
     this.onKeyDownStartGame = true;
