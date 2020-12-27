@@ -183,8 +183,10 @@ export default class Game {
     }
   }
 
-  private heroHit(fire: Fire): void {
-    this.destroySprite(this.stage, fire, this.fireArray);
+  private heroHit(fire: Fire | null): void {
+    if (fire) {
+      this.destroySprite(this.stage, fire, this.fireArray);
+    }
     if (this.hero) {
       this.hero.removeInteractivity();
 
@@ -419,6 +421,10 @@ export default class Game {
           this.enemyMovementInfo.canMoveDown = true;
         }
       } else if (this.enemyMovementInfo.canMoveDown) {
+        if (this.hero && this.hero.y <= this.enemyContainer.y + this.getBottomMostEnemyY() + this.enemyPaddingY) {
+          this.heroHit(null);
+          return;
+        }
         tweenData = enemyTweenData.moveDown;
         this.enemyMovementInfo.canMoveDown = false;
         this.enemyMovementInfo.canMoveRight = !this.enemyMovementInfo.canMoveRight;
@@ -454,5 +460,15 @@ export default class Game {
       }
     });
     return rightX;
+  }
+
+  private getBottomMostEnemyY(): number {
+    let bottomY = 0;
+    this.enemyContainer.children.forEach((child) => {
+      if (child.y > bottomY) {
+        bottomY = child.y;
+      }
+    });
+    return bottomY;
   }
 }
