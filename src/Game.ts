@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import Hero from "./Hero";
 import Fire from "./Fire";
+import GameOverPanel from "./GameOverPanel";
 import Enemy from "./Enemy";
 import Background from "./Background";
 import TWEEN from "@tweenjs/tween.js";
@@ -29,16 +30,14 @@ export default class Game {
   private enemiesTween: any;
   private bigEnemyTween: any;
   private bigEnemy: Enemy | null = null;
-  private gameOverTextConfig = {
+  private textConfig = {
     fontFamily: "Menlo-Bold",
     fontSize: 24,
     fill: 0xde2b63,
     align: "center",
-  };
+  } as PIXI.TextStyle;
   private onKeyDownStartGame = false;
-  private gameOverContainer = new PIXI.Container();
-  private gameOverScoreText: PIXI.Text | undefined;
-  private gameOverHighScoreText: PIXI.Text | undefined;
+  private gameOverPanel: GameOverPanel;
   private scoreText: PIXI.Text | undefined;
   private createBigEnemyTimeout: ReturnType<typeof setTimeout> | undefined;
   private readonly localStorageKey = "High Score";
@@ -49,7 +48,8 @@ export default class Game {
     this.gameHeight = gameHeight;
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
     this.setupBackground();
-    this.setupGameOverPanel();
+    this.gameOverPanel = new GameOverPanel(this.textConfig, this.gameWidth, this.gameHeight);
+    this.stage.addChild(this.gameOverPanel);
     this.setupScore();
     this.startGame();
   }
@@ -87,7 +87,7 @@ export default class Game {
     this.enemyShoot();
     this.createBigEnemy();
     this.onKeyDownStartGame = false;
-    this.stage.removeChild(this.gameOverContainer);
+    this.gameOverPanel.hide();
     this.score = 0;
     this.scoreIncrement = 100;
     if (this.scoreText) {
@@ -102,7 +102,7 @@ export default class Game {
   }
 
   private setupScore(): void {
-    this.scoreText = new PIXI.Text(`SCORE: ${this.score}`, this.gameOverTextConfig);
+    this.scoreText = new PIXI.Text(`SCORE: ${this.score}`, this.textConfig);
     this.stage.addChild(this.scoreText);
     this.scoreText.visible = false;
   }
@@ -204,31 +204,6 @@ export default class Game {
     this.destroyAllEnemies();
   }
 
-  private setupGameOverPanel(): void {
-    const gameOverLabel = new PIXI.Text("GAME OVER, LOSER", this.gameOverTextConfig);
-    gameOverLabel.anchor.set(0.5, 0.5);
-    gameOverLabel.x = this.gameWidth / 2;
-    gameOverLabel.y = this.gameHeight * 0.25;
-    this.gameOverContainer.addChild(gameOverLabel);
-
-    this.gameOverScoreText = new PIXI.Text(`SCORE ${this.score}`, this.gameOverTextConfig);
-    this.gameOverScoreText.anchor.set(0.5, 0.5);
-    this.gameOverScoreText.x = this.gameWidth / 2;
-    this.gameOverScoreText.y = gameOverLabel.y + 50;
-    this.gameOverContainer.addChild(this.gameOverScoreText);
-    this.gameOverHighScoreText = new PIXI.Text(`HIGHSCORE 0`, this.gameOverTextConfig);
-    this.gameOverHighScoreText.anchor.set(0.5, 0.5);
-    this.gameOverHighScoreText.x = this.gameWidth / 2;
-    this.gameOverHighScoreText.y = this.gameOverScoreText.y + 50;
-    this.gameOverContainer.addChild(this.gameOverHighScoreText);
-
-    const playAgain = new PIXI.Text(`PRESS ANY KEY TO PLAY AGAIN 😊`, this.gameOverTextConfig);
-    playAgain.anchor.set(0.5, 0.5);
-    playAgain.x = this.gameWidth / 2;
-    playAgain.y = this.gameOverScoreText.y + 150;
-    this.gameOverContainer.addChild(playAgain);
-  }
-
   private gameOver(): void {
     this.resetBigEnemy(false, false);
     if (this.createBigEnemyTimeout) {
@@ -239,15 +214,8 @@ export default class Game {
       highScore = this.score;
       localStorage.setItem(this.localStorageKey, String(this.score));
     }
-    console.log(localStorage.getItem(this.localStorageKey));
 
-    if (this.gameOverScoreText) {
-      this.gameOverScoreText.text = `SCORE ${this.score}`;
-    }
-    if (this.gameOverHighScoreText) {
-      this.gameOverHighScoreText.text = `HIGHSCORE ${highScore}`;
-    }
-    this.stage.addChild(this.gameOverContainer);
+    this.gameOverPanel.show(this.score, highScore);
     this.onKeyDownStartGame = true;
     if (this.scoreText) {
       this.scoreText.visible = false;
