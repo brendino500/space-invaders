@@ -1,9 +1,13 @@
 body {
   overflow: hidden;
   margin: 0 auto;
-  background-color: black;
+  background-color: #2a6041;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 canvas {
   border-radius: 7px;
+  margin-top: 3%;
 }
