@@ -25,7 +25,6 @@ window.onload = async (): Promise<void> => {
 
   document.body.appendChild(app.view);
 
-  // resizeCanvas();
   new Game(stage, gameWidth, gameHeight);
 };
 
@@ -52,16 +51,4 @@ async function loadGameAssets(): Promise<void> {
 
     loader.load();
   });
-}
-
-function resizeCanvas(): void {
-  const resize = () => {
-    app.renderer.resize(window.innerWidth, window.innerHeight);
-    app.stage.scale.x = window.innerWidth / gameWidth;
-    app.stage.scale.y = window.innerHeight / gameHeight;
-  };
-
-  resize();
-
-  window.addEventListener("resize", resize);
 }
