@@ -3,6 +3,7 @@ import Hero from "./Hero";
 import Fire from "./Fire";
 import GameOverPanel from "./GameOverPanel";
 import Enemy from "./Enemy";
+import EnemiesContainer from "./EnemiesContainer";
 import Background from "./Background";
 import TWEEN from "@tweenjs/tween.js";
 
@@ -12,22 +13,11 @@ export default class Game {
   private gameHeight: number;
   private hero: Hero | undefined;
   private fireArray: Fire[] = [];
-  private enemyArray: Enemy[] = [];
   private score = 0;
   private scoreIncrement = 100;
-  private readonly enemyRows = 5;
-  private readonly enemyColumns = 11;
   private readonly enemyPaddingX = 40;
   private readonly enemyPaddingY = 30;
-  private maxEnemyContainerWidth: number | undefined;
-  private enemySpeed = 1000;
-  private enemyContainer = new PIXI.Container();
-  private enemyMovementInfo = {
-    canMoveRight: true,
-    canMoveDown: false,
-  };
-  private enemiesInterval: number | undefined;
-  private enemiesTween: any;
+  private enemiesContainer: EnemiesContainer;
   private bigEnemyTween: any;
   private bigEnemy: Enemy | null = null;
   private textConfig = {
@@ -51,6 +41,11 @@ export default class Game {
     this.gameOverPanel = new GameOverPanel(this.textConfig, this.gameWidth, this.gameHeight);
     this.stage.addChild(this.gameOverPanel);
     this.setupScore();
+    this.enemiesContainer = new EnemiesContainer(gameWidth, gameHeight, this.enemyPaddingX, this.enemyPaddingY);
+    this.enemiesContainer.on(this.enemiesContainer.HERO_HIT_EVENT, () => {
+      this.heroHit(null);
+    });
+    this.stage.addChild(this.enemiesContainer);
     this.startGame();
   }
 
@@ -79,11 +74,9 @@ export default class Game {
     });
     this.hero = new Hero(heroTextures, this.gameWidth, this.gameHeight);
     this.stage.addChild(this.hero);
-    this.enemyContainer.y = this.enemyPaddingY;
-    this.stage.addChild(this.enemyContainer);
     this.createListeners();
-    this.createEnemies();
-    this.moveEnemies();
+    this.enemiesContainer.create();
+    this.enemiesContainer.move(this.hero);
     this.enemyShoot();
     this.createBigEnemy();
     this.onKeyDownStartGame = false;
@@ -138,13 +131,13 @@ export default class Game {
             this.resetBigEnemy(true);
           }
         }
-        this.enemyArray.forEach((enemy) => {
+        this.enemiesContainer.enemyArray.forEach((enemy) => {
           const yOverlap =
-            fire.y - fire.height / 2 < enemy.y + this.enemyContainer.y + enemy.height / 2 &&
-            fire.y + fire.height / 2 > enemy.y + this.enemyContainer.y - enemy.height / 2;
+            fire.y - fire.height / 2 < enemy.y + this.enemiesContainer.y + enemy.height / 2 &&
+            fire.y + fire.height / 2 > enemy.y + this.enemiesContainer.y - enemy.height / 2;
           const xOverlap =
-            fire.x - fire.width / 2 < enemy.x + this.enemyContainer.x + enemy.width / 2 &&
-            fire.x + fire.width / 2 > enemy.x + this.enemyContainer.x - enemy.width / 2;
+            fire.x - fire.width / 2 < enemy.x + this.enemiesContainer.x + enemy.width / 2 &&
+            fire.x + fire.width / 2 > enemy.x + this.enemiesContainer.x - enemy.width / 2;
           const hit: boolean = yOverlap && xOverlap;
           if (hit) {
             tween.stop();
@@ -172,13 +165,13 @@ export default class Game {
   }
 
   private enemyHit(fire: Fire, enemy: Enemy): void {
-    this.destroySprite(this.enemyContainer, enemy, this.enemyArray);
+    this.destroySprite(this.enemiesContainer, enemy, this.enemiesContainer.enemyArray);
     this.destroySprite(this.stage, fire, this.fireArray);
     this.score += this.scoreIncrement;
     if (this.scoreText) {
       this.scoreText.text = `SCORE: ${this.score}`;
     }
-    if (this.enemyArray.length === 0) {
+    if (this.enemiesContainer.enemyArray.length === 0) {
       this.levelComplete();
     }
   }
@@ -204,6 +197,11 @@ export default class Game {
     this.destroyAllEnemies();
   }
 
+  private destroyAllEnemies(): void {
+    this.enemiesContainer.destroy();
+    this.resetBigEnemy(false, false);
+  }
+
   private gameOver(): void {
     this.resetBigEnemy(false, false);
     if (this.createBigEnemyTimeout) {
@@ -222,104 +220,20 @@ export default class Game {
     }
   }
 
-  private destroyAllEnemies(): void {
-    this.destroyEnemies();
-    this.resetEnemiesTween();
-    this.resetBigEnemy(false, false);
-  }
-
   private enemyShoot(): void {
-    const randomEnemy = this.enemyArray[Math.floor(Math.random() * this.enemyArray.length)];
-    this.handleShoot(this.enemyContainer.x + randomEnemy.x, this.enemyContainer.y + randomEnemy.y, false);
+    const randomEnemyPosition = this.enemiesContainer.getRandomEnemyPosition();
+    this.handleShoot(randomEnemyPosition.x, randomEnemyPosition.y, false);
   }
 
   private levelComplete(): void {
-    this.enemySpeed *= 0.9;
+    this.enemiesContainer.levelComplete();
     this.scoreIncrement *= 2;
-    this.resetEnemiesTween();
-    this.createEnemies();
-    this.moveEnemies();
-  }
-
-  private resetEnemiesTween(): void {
-    clearInterval(this.enemiesInterval);
-    this.enemiesTween.stop();
-    this.enemyContainer.position.set(0, this.enemyPaddingY);
-    this.enemyMovementInfo.canMoveDown = false;
-    this.enemyMovementInfo.canMoveRight = true;
   }
 
   private destroySprite(parent: PIXI.Container, sprite: PIXI.Sprite, spriteArray: PIXI.Sprite[]): void {
     parent.removeChild(sprite);
     const index = spriteArray.indexOf(sprite);
     spriteArray.splice(index, 1);
-  }
-
-  private createEnemies(): void {
-    const enemyTexturesArray = [
-      [
-        "duck00.png",
-        "duck01.png",
-        "duck02.png",
-        "duck03.png",
-        "duck04.png",
-        "duck05.png",
-        "duck06.png",
-        "duck07.png",
-        "duck08.png",
-        "duck09.png",
-      ].map((e) => {
-        return PIXI.Texture.from(e);
-      }),
-      [
-        "bunny00.png",
-        "bunny01.png",
-        "bunny02.png",
-        "bunny03.png",
-        "bunny04.png",
-        "bunny05.png",
-        "bunny06.png",
-        "bunny07.png",
-      ].map((e) => {
-        return PIXI.Texture.from(e);
-      }),
-      [
-        "angry_pig00.png",
-        "angry_pig01.png",
-        "angry_pig02.png",
-        "angry_pig03.png",
-        "angry_pig04.png",
-        "angry_pig05.png",
-        "angry_pig06.png",
-        "angry_pig07.png",
-        "angry_pig08.png",
-      ].map((e) => {
-        return PIXI.Texture.from(e);
-      }),
-    ];
-    for (let i = 0; i < this.enemyColumns; i++) {
-      for (let j = 0; j < this.enemyRows; j++) {
-        const enemyLayout = [0, 1, 1, 2, 2];
-        const enemyTextures = enemyTexturesArray[enemyLayout[j]];
-        const enemy = new Enemy(
-          enemyTextures,
-          this.gameWidth,
-          this.gameHeight,
-          this.enemyPaddingX + this.enemyPaddingX * i,
-          this.enemyPaddingY + this.enemyPaddingY * j
-        );
-        this.enemyContainer.addChild(enemy);
-        this.enemyArray.push(enemy);
-      }
-    }
-    this.maxEnemyContainerWidth = this.enemyContainer.width;
-  }
-
-  private destroyEnemies(): void {
-    this.enemyArray.forEach((enemy: Enemy) => {
-      this.enemyContainer.removeChild(enemy);
-    });
-    this.enemyArray = [];
   }
 
   private createBigEnemy(): void {
@@ -373,70 +287,5 @@ export default class Game {
         }
       }
     }
-  }
-
-  private moveEnemies(): void {
-    this.enemiesInterval = (setInterval(() => {
-      const enemyTweenData = {
-        moveRight: { x: this.enemyContainer.x + this.enemyPaddingX },
-        moveLeft: { x: this.enemyContainer.x - this.enemyPaddingX },
-        moveDown: { y: this.enemyContainer.y + this.enemyPaddingY },
-      };
-      let tweenData = {};
-      if (this.enemyMovementInfo.canMoveRight && !this.enemyMovementInfo.canMoveDown) {
-        tweenData = enemyTweenData.moveRight;
-        if (this.enemyContainer.x + this.getRightMostEnemyX() + this.enemyPaddingX * 2.5 > this.gameWidth) {
-          this.enemyMovementInfo.canMoveDown = true;
-        }
-      } else if (this.enemyMovementInfo.canMoveDown) {
-        if (this.hero && this.hero.y <= this.enemyContainer.y + this.getBottomMostEnemyY() + this.enemyPaddingY) {
-          this.heroHit(null);
-          return;
-        }
-        tweenData = enemyTweenData.moveDown;
-        this.enemyMovementInfo.canMoveDown = false;
-        this.enemyMovementInfo.canMoveRight = !this.enemyMovementInfo.canMoveRight;
-      } else {
-        tweenData = enemyTweenData.moveLeft;
-        if (this.enemyContainer.x + this.getLeftMostEnemyX() - this.enemyPaddingX * 2.5 < 0) {
-          this.enemyMovementInfo.canMoveDown = true;
-        }
-      }
-
-      this.enemiesTween = new TWEEN.Tween({ enemiesContainer: this.enemyContainer })
-        .to({ enemiesContainer: tweenData }, this.enemySpeed / 2)
-        .easing(TWEEN.Easing.Sinusoidal.InOut);
-      this.enemiesTween.start(performance.now());
-    }, this.enemySpeed) as unknown) as number;
-  }
-
-  private getLeftMostEnemyX(): number {
-    let leftX = this.maxEnemyContainerWidth || 0;
-    this.enemyContainer.children.forEach((child) => {
-      if (child.x < leftX) {
-        leftX = child.x;
-      }
-    });
-    return leftX;
-  }
-
-  private getRightMostEnemyX(): number {
-    let rightX = 0;
-    this.enemyContainer.children.forEach((child) => {
-      if (child.x > rightX) {
-        rightX = child.x;
-      }
-    });
-    return rightX;
-  }
-
-  private getBottomMostEnemyY(): number {
-    let bottomY = 0;
-    this.enemyContainer.children.forEach((child) => {
-      if (child.y > bottomY) {
-        bottomY = child.y;
-      }
-    });
-    return bottomY;
   }
 }
