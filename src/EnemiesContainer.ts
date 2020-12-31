@@ -16,6 +16,7 @@ export default class EnemiesContainer extends PIXI.Container {
     canMoveDown: false,
   };
   private enemiesInterval: number | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private enemiesTween: any;
   private gameWidth: number;
   private gameHeight: number;

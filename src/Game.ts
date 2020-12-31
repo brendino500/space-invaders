@@ -18,6 +18,7 @@ export default class Game {
   private readonly enemyPaddingX = 40;
   private readonly enemyPaddingY = 30;
   private enemiesContainer: EnemiesContainer;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private bigEnemyTween: any;
   private bigEnemy: Enemy | null = null;
   private textConfig = {
